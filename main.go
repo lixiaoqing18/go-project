@@ -1,24 +1,35 @@
 package main
 
-import (
-	"fmt"
-	"math"
-)
+func Generate(ch chan<- int) {
+	for i := 2; ; i++ {
+		ch <- i
+		//fmt.Println("Generate a ", i)
+	}
+}
 
-func Sqrt(x float64) float64 {
-	z := x / 2
-	var last float64
+func Filter(in <-chan int, out chan<- int, prime int) {
 	for {
-		last = z
-		z -= (z*z - x) / (2 * z)
-		fmt.Println("z = %j", z)
-		if math.Abs(z-last) <= 0.00000001 {
-			break
+		i := <-in
+		//print("filter ", i, " prime ", prime, "\n")
+		if i%prime != 0 {
+			out <- i
+			//print("out ", i, " prime ", prime, "\n")
 		}
 	}
-	return z
 }
 
 func main() {
-	fmt.Println("result is ", Sqrt(9))
+	ch := make(chan int)
+	go Generate(ch)
+	for {
+		prime := <-ch
+		if prime > 100 {
+			break
+		}
+		print(prime, "\n")
+		ch1 := make(chan int)
+		go Filter(ch, ch1, prime)
+		ch = ch1
+
+	}
 }
