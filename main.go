@@ -1,35 +1,58 @@
 package main
 
-func Generate(ch chan<- int) {
-	for i := 2; ; i++ {
-		ch <- i
-		//fmt.Println("Generate a ", i)
-	}
-}
+import (
+	"fmt"
+)
 
-func Filter(in <-chan int, out chan<- int, prime int) {
-	for {
-		i := <-in
-		//print("filter ", i, " prime ", prime, "\n")
-		if i%prime != 0 {
-			out <- i
-			//print("out ", i, " prime ", prime, "\n")
-		}
+func solve(s string, t string) string {
+	// write code here
+	i := len(s) - 1
+	j := len(t) - 1
+	max := j
+	if i > j {
+		max = i
+	}
+	var low int
+	var high int
+	result := make([]byte, max+2)
+	pos := max + 1
+	for i >= 0 && j >= 0 {
+		sum := int(s[i]-'0') + int(t[j]-'0') + high
+		low = sum % 10
+		high = sum / 10
+		result[pos] = byte(low + '0')
+		pos--
+		i--
+		j--
+	}
+	for i >= 0 {
+		sum := int(s[i]-'0') + high
+		low = sum % 10
+		high = sum / 10
+		result[pos] = byte(low + '0')
+		pos--
+		i--
+	}
+	for j >= 0 {
+		sum := int(t[j]-'0') + high
+		low = sum % 10
+		high = sum / 10
+		result[pos] = byte(low + '0')
+		pos--
+		j--
+	}
+	if high > 0 {
+		result[pos] = byte(high + '0')
+		return string(result)
+	} else {
+		return string(result[1:])
 	}
 }
 
 func main() {
-	ch := make(chan int)
-	go Generate(ch)
-	for {
-		prime := <-ch
-		if prime > 100 {
-			break
-		}
-		print(prime, "\n")
-		ch1 := make(chan int)
-		go Filter(ch, ch1, prime)
-		ch = ch1
+	s := "0"
+	t := "0"
+	r := solve(s, t)
+	fmt.Printf("%s", r)
 
-	}
 }
